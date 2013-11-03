@@ -27,11 +27,11 @@
           <version>14.0</version>
       </dependency>
       <!-- projet symja : http://code.google.com/p/symja/ -->
-      <dependency>
+      <!--<dependency>
           <groupId>org.matheclipse</groupId>
           <artifactId>matheclipse-parser</artifactId>
           <version>0.0.7</version>
-      </dependency>
+      </dependency>-->
       <!--<dependency>
             <groupId>org.matheclipse</groupId>
             <artifactId>matheclipse</artifactId>
@@ -40,7 +40,7 @@
 
   </dependencies>
 
-    <repositories>
+    <!--<repositories>
                     <repository>
                             <id>org-matheclipse-repository</id>
                             <url>http://symja.googlecode.com/svn/maven-repository/</url>
@@ -51,6 +51,6 @@
                                     <enabled>false</enabled>
                             </snapshots>
                     </repository>
-            </repositories>
+            </repositories>-->
 
 </project>

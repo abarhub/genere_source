@@ -2,10 +2,10 @@ package org.genere_source;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
-import org.matheclipse.parser.client.Parser;
+/*import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.*;
 import org.matheclipse.parser.client.eval.DoubleEvaluator;
-import org.matheclipse.parser.client.operator.InfixOperator;
+import org.matheclipse.parser.client.operator.InfixOperator;*/
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -115,7 +115,7 @@ public class GenereCode {
 		//liste_initialisation=calcul_initialisation(nb_var_local,nb_param);
 		if(res!=null&&!res.isEmpty())
 		{
-			Set<String> set;
+			/*Set<String> set;
 			//EvalUtilities util = new EvalUtilities();
 			DoubleEvaluator engine = new DoubleEvaluator();
 			Parser p = new Parser();
@@ -142,68 +142,68 @@ public class GenereCode {
 						set.add(s2);
 					}
 				}
-			}
+			}*/
 		}
 	}
 
-	private String convert(ASTNode tmp2) {
-		if(tmp2 instanceof IntegerNode)
-		{
-			IntegerNode tmp3=(IntegerNode)tmp2;
-			return ""+tmp3;
-		}
-		else if(tmp2 instanceof FunctionNode)
-		{
-			FunctionNode tmp3= (FunctionNode) tmp2;
-			System.out.println("tmp2_0="+tmp2);
-			//int i=1/0;
-			ASTNode op = ((FunctionNode) tmp2).get(0);
-			String debut,fin,oper;
-			if(op.getString().equals("Plus"))
+	/*private String convert(ASTNode tmp2) {
+			if(tmp2 instanceof IntegerNode)
 			{
-				oper="+";
+				IntegerNode tmp3=(IntegerNode)tmp2;
+				return ""+tmp3;
 			}
-			else if(op.getString().equals("Times"))
+			else if(tmp2 instanceof FunctionNode)
 			{
-				oper="*";
+				FunctionNode tmp3= (FunctionNode) tmp2;
+				System.out.println("tmp2_0="+tmp2);
+				//int i=1/0;
+				ASTNode op = ((FunctionNode) tmp2).get(0);
+				String debut,fin,oper;
+				if(op.getString().equals("Plus"))
+				{
+					oper="+";
+				}
+				else if(op.getString().equals("Times"))
+				{
+					oper="*";
+				}
+				else if(op.getString().equals("Minus"))
+				{
+					oper="-";
+				}
+				else if(op.getString().equals("Div"))
+				{
+					oper="/";
+				}
+				else if(op.getString().equals("Power"))
+				{
+					oper="^";
+				}
+				else
+				{
+					System.out.println("op="+op.getString());
+					int i=1/0;
+					oper=null;
+				}
+				debut=convert(tmp3.get(1));
+				fin=convert(tmp3.get(2));
+				return debut+oper+fin;
 			}
-			else if(op.getString().equals("Minus"))
+			else if(tmp2 instanceof SymbolNode)
 			{
-				oper="-";
+				return ""+tmp2;
 			}
-			else if(op.getString().equals("Div"))
+			else if(tmp2 instanceof FractionNode)
 			{
-				oper="/";
-			}
-			else if(op.getString().equals("Power"))
-			{
-				oper="^";
+				return ""+tmp2;
 			}
 			else
 			{
-				System.out.println("op="+op.getString());
+				System.out.println("tmp2="+tmp2+";"+tmp2.getClass());
 				int i=1/0;
-				oper=null;
+				return null;
 			}
-			debut=convert(tmp3.get(1));
-			fin=convert(tmp3.get(2));
-			return debut+oper+fin;
-		}
-		else if(tmp2 instanceof SymbolNode)
-		{
-			return ""+tmp2;
-		}
-		else if(tmp2 instanceof FractionNode)
-		{
-			return ""+tmp2;
-		}
-		else
-		{
-			System.out.println("tmp2="+tmp2+";"+tmp2.getClass());
-			int i=1/0;
-			return null;
-		}
-	}
+		}*/
 
 	public void generation_code(List<List<Object>> parametres,List<Object> resultat){
 		this.parametres=parametres;
