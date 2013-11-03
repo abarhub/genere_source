@@ -165,7 +165,7 @@ public class Simplifie {
 							s2=enfant2.toString();
 							if(s1.equals("0"))
 							{
-								res=new ConstEntierProg(1);
+								res=new ConstEntierProg(0);
 								simpl=true;
 							}
 							else if(s2.equals("0"))
