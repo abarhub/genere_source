@@ -1,0 +1,3 @@
+http://www.miximum.fr/tutos/1546-enfin-comprendre-git
+http://www.unixgarden.com/index.php/gnu-linux-magazine/git-it
+http://www.unixgarden.com/index.php/gnu-linux-magazine/git-pour-les-futurs-barbus
