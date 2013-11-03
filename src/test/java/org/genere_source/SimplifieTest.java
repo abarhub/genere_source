@@ -105,6 +105,56 @@ public class SimplifieTest {
 		Assert.assertEquals("2",res.toString());
 	}
 
+    @Test
+   	public void test4()
+   	{
+   		ExpProg e1,res;
+
+   		e1=moinsu(donne_entier(7));
+   		res=Simplifie.simplifie(e1);
+   		Assert.assertEquals("-7",res.toString());
+
+        e1=plus(donne_entier(8),moinsu(donne_entier(2)));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("6",res.toString());
+
+        e1=moinsu(moinsu(donne_entier(12)));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("12",res.toString());
+
+        e1=plus(donne_var("a1"),plus(donne_var("a2"),moinsu(donne_var("a3"))));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("(a1+a2)-a3",res.toString());
+
+        e1=plus(donne_var("a1"),plus(donne_var("a2"),moinsu(donne_var("a1"))));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("a2",res.toString());
+
+        e1=moins(donne_entier(0),donne_var("a5"));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("-a5",res.toString());
+
+        e1=fois(moins(donne_entier(0),donne_var("a1")),moins(donne_entier(0),donne_var("a2")));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("a1*a2",res.toString());
+
+        e1=fois(moinsu(donne_var("a1")),moinsu(donne_var("a2")));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("a1*a2",res.toString());
+
+        e1=fois(moinsu(donne_var("a1")),donne_var("a2"));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("(-a1)*a2",res.toString());
+
+        e1=fois(donne_var("a1"),moinsu(donne_var("a2")));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("(-a1)*a2",res.toString());
+
+        e1=fois(donne_var("a2"),moinsu(donne_var("a1")));
+        res=Simplifie.simplifie(e1);
+        Assert.assertEquals("(-a1)*a2",res.toString());
+   	}
+
 	public ConstEntierProg donne_entier(int n)
 	{
 		return new ConstEntierProg(n);
@@ -134,4 +184,9 @@ public class SimplifieTest {
 	{
 		return new OperationBinaireProg(OperateurProg.Div, e1,e2);
 	}
+
+    public OperationUnaireProg moinsu(ExpProg e1)
+   	{
+   		return new OperationUnaireProg(OperateurProg.Moins, e1);
+   	}
 }

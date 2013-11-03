@@ -98,6 +98,11 @@ public class Simplifie {
 								res=new OperationBinaireProg(OperateurProg.Plus,enfant1,new ConstEntierProg(-((ConstEntierProg) enfant2).getN()));
 								simpl=true;
 							}
+                            else if(enfant1 instanceof ConstEntierProg&&((ConstEntierProg) enfant1).getN()==0)
+                            {
+                                res=new OperationUnaireProg(OperateurProg.Moins,enfant2);
+                                simpl=true;
+                            }
 							else if(enfant1 instanceof OperationBinaireProg||enfant2 instanceof OperationBinaireProg)
 							{
 								ExpProg tmp2;
@@ -141,7 +146,8 @@ public class Simplifie {
 								res=new ConstEntierProg(((ConstEntierProg) enfant1).getN()*((ConstEntierProg) enfant2).getN());
 								simpl=true;
 							}
-							else if(enfant1 instanceof OperationBinaireProg||enfant2 instanceof OperationBinaireProg)
+							else if(enfant1 instanceof OperationBinaireProg||enfant2 instanceof OperationBinaireProg
+                                    ||enfant1 instanceof OperationUnaireProg||enfant2 instanceof OperationUnaireProg)
 							{
 								ExpProg tmp2;
 								tmp2=regroupe_multiplication(tmp);
@@ -223,6 +229,56 @@ public class Simplifie {
 					exp=res;
 				}while(simpl);
 			}
+            else if(e instanceof OperationUnaireProg)
+            {
+                exp=((OperationUnaireProg) e).getVal1();
+                exp=simplifie(exp);
+                if(((OperationUnaireProg) e).getOp()==OperateurProg.Moins)
+                {
+                    if(exp instanceof OperationUnaireProg)
+                    {
+                        if(((OperationUnaireProg) exp).getOp()==OperateurProg.Moins)
+                        {
+                            res=((OperationUnaireProg) exp).getVal1();
+                        }
+                        else if(((OperationUnaireProg) exp).getOp()==OperateurProg.Plus)
+                        {
+                            ExpProg tmp2 = ((OperationUnaireProg) exp).getVal1();
+                            if(tmp2 instanceof ConstEntierProg)
+                            {
+                                res=new ConstEntierProg(-((ConstEntierProg) tmp2).getN());
+                            }
+                            else
+                            {
+                                res=new OperationUnaireProg(OperateurProg.Moins,tmp2);
+                            }
+                        }
+                        else
+                        {
+                            Preconditions.checkState(false);
+                        }
+                    }
+                    else
+                    {
+                        if(exp instanceof ConstEntierProg)
+                        {
+                            res=new ConstEntierProg(-((ConstEntierProg) exp).getN());
+                        }
+                        else
+                        {
+                            res=new OperationUnaireProg(OperateurProg.Moins,exp);
+                        }
+                    }
+                }
+                else if(((OperationUnaireProg) e).getOp()==OperateurProg.Plus)
+                {
+                    res=exp;
+                }
+                else
+                {
+                    Preconditions.checkState(false);
+                }
+            }
 			else
 			{
 				res=e;
@@ -343,8 +399,8 @@ public class Simplifie {
 				}
 				else if(liste2.size()==0&&liste3.size()>0)
 				{
-					OperationBinaireProg tmp2;
-					tmp2=new OperationBinaireProg(OperateurProg.Moins,new ConstEntierProg(0),liste3.get(0));
+					ExpProg tmp2;
+					tmp2=new OperationUnaireProg(OperateurProg.Moins,liste3.get(0));
 					for(int i=1;i<liste3.size();i++)
 					{
 						tmp2=new OperationBinaireProg(OperateurProg.Moins,tmp2,liste3.get(i));
@@ -392,7 +448,27 @@ public class Simplifie {
 		}
 		else
 		{
-			liste.add(enfant1);
+            if(enfant1 instanceof OperationUnaireProg)
+            {
+                if(((OperationUnaireProg) enfant1).getOp()==OperateurProg.Plus)
+                {
+                    ExpProg exp = ((OperationUnaireProg) enfant1).getVal1();
+                    ajoute_exp(liste, liste_moins, exp);
+                }
+                else if(((OperationUnaireProg) enfant1).getOp()==OperateurProg.Moins)
+                {
+                    ExpProg exp = ((OperationUnaireProg) enfant1).getVal1();
+                    ajoute_exp(liste_moins,liste, exp);
+                }
+                else
+                {
+                    Preconditions.checkState(false);
+                }
+            }
+            else
+            {
+			    liste.add(enfant1);
+            }
 		}
 	}
 
@@ -402,16 +478,19 @@ public class Simplifie {
 		{
 			List<ExpProg> liste_plus=null,liste_autre,liste2,liste_moins,liste_autre_moins,liste3;
 			List<VariableProg> liste_variables,liste_variables_moins;
-			int nb;
+			int nb,nb_moins;
 			boolean contient_nombre;
 			ExpProg enfant1 = tmp.getVal1();
 			ExpProg enfant2 = tmp.getVal2();
-			if((enfant1 instanceof OperationBinaireProg&&
+			if( (enfant1 instanceof OperationBinaireProg&&
 					(( ((OperationBinaireProg) enfant1).getOp()==OperateurProg.Fois)
 						|| ((OperationBinaireProg) enfant1).getOp()==OperateurProg.Div)
 				||(enfant2 instanceof OperationBinaireProg&&
 					(( ((OperationBinaireProg) enfant2).getOp()==OperateurProg.Fois)
-						|| ((OperationBinaireProg) enfant2).getOp()==OperateurProg.Div)) ))
+						|| ((OperationBinaireProg) enfant2).getOp()==OperateurProg.Div))
+                ||(enfant1 instanceof OperationUnaireProg)
+                ||(enfant2 instanceof OperationUnaireProg)
+                ) )
 			{
 				liste_plus=new ArrayList<ExpProg>();
 				liste_moins=new ArrayList<ExpProg>();
@@ -425,17 +504,24 @@ public class Simplifie {
 					multi_exp(liste_moins,liste_plus,enfant2);
 				}
 				nb=1;
-				contient_nombre=false;
+                nb_moins=0;
 				liste_variables=new ArrayList<VariableProg>();
 				liste_autre=new ArrayList<ExpProg>();
 				liste_variables_moins=new ArrayList<VariableProg>();
 				liste_autre_moins=new ArrayList<ExpProg>();
 				for(ExpProg e:liste_plus)
 				{
+                    if(e instanceof OperationUnaireProg)
+                    {
+                        if(((OperationUnaireProg)e).getOp()==OperateurProg.Moins)
+                        {
+                            nb_moins++;
+                        }
+                        e=((OperationUnaireProg)e).getVal1();
+                    }
 					if(e instanceof ConstEntierProg)
 					{
 						nb*=((ConstEntierProg) e).getN();
-						contient_nombre=true;
 					}
 					else if(e instanceof VariableProg)
 					{
@@ -448,10 +534,17 @@ public class Simplifie {
 				}
 				for(ExpProg e:liste_moins)
 				{
+                    if(e instanceof OperationUnaireProg)
+                    {
+                        if(((OperationUnaireProg)e).getOp()==OperateurProg.Moins)
+                        {
+                            nb_moins++;
+                        }
+                        e=((OperationUnaireProg)e).getVal1();
+                    }
 					if(e instanceof ConstEntierProg)
 					{
 						nb/=((ConstEntierProg) e).getN();
-						contient_nombre=true;
 					}
 					else if(e instanceof VariableProg)
 					{
@@ -494,6 +587,11 @@ public class Simplifie {
 				liste2=new ArrayList<ExpProg>();
 				if(nb!=1)
 				{
+                    if(nb_moins%2==1)
+                    {
+                        nb=-nb;
+                        nb_moins=0;
+                    }
 					liste2.add(new ConstEntierProg(nb));
 				}
 				liste2.addAll(liste_variables);
@@ -501,6 +599,17 @@ public class Simplifie {
 				liste3=new ArrayList<ExpProg>();
 				liste3.addAll(liste_variables_moins);
 				liste3.addAll(liste_autre_moins);
+                if(nb_moins%2==1)
+                {
+                    if(liste2.size()>0)
+                    {
+                        liste2.set(0,new OperationUnaireProg(OperateurProg.Moins,liste2.get(0)));
+                    }
+                    else if(liste3.size()>0)
+                    {
+                        liste3.set(0,new OperationUnaireProg(OperateurProg.Moins,liste3.get(0)));
+                    }
+                }
 				if(liste2.size()==0&&liste3.size()==0||nb==0)
 				{
 					return new ConstEntierProg(0);
@@ -511,8 +620,8 @@ public class Simplifie {
 				}
 				else if(liste2.size()==0&&liste3.size()>0)
 				{
-					OperationBinaireProg tmp2;
-					tmp2=new OperationBinaireProg(OperateurProg.Div,new ConstEntierProg(1),liste3.get(0));
+					ExpProg tmp2;
+					tmp2=new OperationUnaireProg(OperateurProg.Moins,liste3.get(0));
 					for(int i=1;i<liste3.size();i++)
 					{
 						tmp2=new OperationBinaireProg(OperateurProg.Div,tmp2,liste3.get(i));
@@ -558,6 +667,25 @@ public class Simplifie {
 			multi_exp(liste, liste_moins, ((OperationBinaireProg) enfant1).getVal1());
 			multi_exp(liste_moins, liste, ((OperationBinaireProg) enfant1).getVal2());
 		}
+        else if(enfant1 instanceof OperationUnaireProg&&((OperationUnaireProg) enfant1).getOp()==OperateurProg.Plus)
+        {
+            multi_exp(liste, liste_moins, ((OperationUnaireProg) enfant1).getVal1());
+        }
+        else if(enfant1 instanceof OperationUnaireProg&&((OperationUnaireProg) enfant1).getOp()==OperateurProg.Moins)
+        {
+            List<ExpProg> liste1,liste2;
+            liste1=new ArrayList<ExpProg>();
+            liste2=new ArrayList<ExpProg>();
+            multi_exp(liste1, liste2, ((OperationUnaireProg) enfant1).getVal1());
+            for(ExpProg tmp:liste1)
+            {
+                liste.add(new OperationUnaireProg(OperateurProg.Moins,tmp));
+            }
+            for(ExpProg tmp:liste2)
+            {
+                liste_moins.add(new OperationUnaireProg(OperateurProg.Moins,tmp));
+            }
+        }
 		else
 		{
 			liste.add(enfant1);

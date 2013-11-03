@@ -27,8 +27,8 @@ public class ConstEntierProg implements ExpProg {
 
 	@Override
 	public String toString() {
-		if(n<0)
-			return " "+n;
+		/*if(n<0)
+			return " "+n;*/
 		return ""+n;
 
 	}
